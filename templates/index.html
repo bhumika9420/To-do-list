@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Today | Little List</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main class="todo">
+    <header class="topline">
+      <a class="wordmark" href="/" aria-label="Little List home"><span class="mark">l</span> little list</a>
+      <span class="today-label">YOUR DAY, IN ORDER</span>
+    </header>
+
+    <section class="list-area" aria-labelledby="page-title">
+      <div class="heading-row">
+        <div>
+          <p class="eyebrow">A FRESH PAGE</p>
+          <h1 id="page-title">Today<span class="period">.</span></h1>
+        </div>
+        <p class="task-count"><strong>{{ tasks|selectattr('completed', 'equalto', 0)|list|length }}</strong><br>left to do</p>
+      </div>
+
+      <form class="add-form" method="post">
+        <input type="hidden" name="action" value="add">
+        <label class="visually-hidden" for="new-task">Add a task</label>
+        <input id="new-task" name="title" type="text" placeholder="What needs doing?" maxlength="200" required autocomplete="off">
+        <button type="submit" aria-label="Add task" title="Add task">+</button>
+      </form>
+
+      {% if tasks %}
+        <ul class="task-list">
+          {% for task in tasks %}
+            <li class="task-row{% if task.completed %} is-done{% endif %}">
+              <form method="post" class="task-main">
+                <input type="hidden" name="action" value="toggle">
+                <input type="hidden" name="task_id" value="{{ task.id }}">
+                <button class="check" type="submit" aria-label="{% if task.completed %}Mark {{ task.title }} as not done{% else %}Mark {{ task.title }} as done{% endif %}" title="Toggle task">
+                  {% if task.completed %}<span aria-hidden="true">✓</span>{% endif %}
+                </button>
+                <span class="task-title">{{ task.title }}</span>
+              </form>
+              <form method="post" class="delete-form">
+                <input type="hidden" name="action" value="delete">
+                <input type="hidden" name="task_id" value="{{ task.id }}">
+                <button class="delete" type="submit" aria-label="Delete {{ task.title }}" title="Delete task">×</button>
+              </form>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="empty-state">
+          <p>Nothing on the list yet.</p>
+          <span>Add one small thing to get started.</span>
+        </div>
+      {% endif %}
+
+      <footer class="list-footer">
+        <span>{{ tasks|length }} task{% if tasks|length != 1 %}s{% endif %} total</span>
+        <span>One thing at a time.</span>
+      </footer>
+    </section>
+  </main>
+</body>
+</html>
